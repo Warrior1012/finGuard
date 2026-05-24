@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinGuard — Invisible Fraud Detector</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0d0d1a;
+  --bg2:       #12122a;
+  --bg3:       #1a1a35;
+  --card:      #16163a;
+  --card2:     #1e1e42;
+  --border:    rgba(130,100,255,0.18);
+  --border2:   rgba(130,100,255,0.32);
+  --purple:    #7c3aed;
+  --purple2:   #9d5cff;
+  --purple3:   #c084fc;
+  --purple-glow: rgba(124,58,237,0.25);
+  --pink:      #ec4899;
+  --ink:       #f1f0ff;
+  --ink2:      #c4c0e8;
+  --ink3:      #8880b8;
+  --green:     #10b981;
+  --green-soft:#0d2e22;
+  --green-mid: #16a05a44;
+  --amber:     #f59e0b;
+  --amber-soft:#2d1f00;
+  --amber-mid: #f59e0b44;
+  --red:       #ef4444;
+  --red-soft:  #2d0a0a;
+  --red-mid:   #ef444444;
+  --radius:    12px;
+  --radius2:   8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
+
+/* BACKGROUND GLOW */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse, rgba(124,58,237,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* ── HEADER ─────────────────────────────────────────────────────────── */
+header {
+  padding: 28px 0 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+.logo {
+  display: flex; align-items: center; gap: 12px;
+}
+.logo-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 0 24px var(--purple-glow);
+}
+.logo-text { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+.logo-text span { color: var(--purple3); }
+.logo-sub { font-size: 0.7rem; color: var(--ink3); margin-top: 2px; font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.status-pill {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--card); border: 1px solid var(--border);
+  padding: 7px 14px; border-radius: 100px;
+  font-size: 0.72rem; font-weight: 500; color: var(--ink2);
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,0.4)} 50%{opacity:0.7;box-shadow:0 0 0 5px rgba(16,185,129,0)} }
+
+/* ── DEMO BAR ────────────────────────────────────────────────────────── */
+.demo-bar {
+  margin: 20px 0;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 14px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.demo-label { font-size: 0.72rem; color: var(--ink3); font-weight: 500; white-space: nowrap; }
+.demo-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.demo-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem; font-weight: 500;
+  padding: 6px 16px; border-radius: 100px; cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--card2); color: var(--ink2);
+  transition: all 0.2s;
+}
+.demo-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+.demo-btn.warn { border-color: var(--amber-mid); color: var(--amber); background: var(--amber-soft); }
+.demo-btn.warn:hover { background: var(--amber); color: #000; }
+.demo-btn.danger { border-color: var(--red-mid); color: var(--red); background: var(--red-soft); }
+.demo-btn.danger:hover { background: var(--red); color: #fff; }
+
+/* ── TABS ────────────────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex; gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.tab-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem; font-weight: 500;
+  padding: 12px 20px; cursor: pointer;
+  border: none; background: transparent; color: var(--ink3);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all 0.2s; border-radius: 8px 8px 0 0;
+}
+.tab-btn:hover { color: var(--ink2); background: rgba(124,58,237,0.08); }
+.tab-btn.active { color: var(--purple3); border-bottom-color: var(--purple); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ── MAIN GRID ───────────────────────────────────────────────────────── */
+.main-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media(max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+/* ── PANEL ───────────────────────────────────────────────────────────── */
+.panel {
+  overflow : hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.panel-title {
+  font-size: 0.72rem; font-weight: 600; color: var(--ink3);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 20px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── FORM ────────────────────────────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width : 100%; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 0.72rem; font-weight: 500; color: var(--ink3); }
+input, select {
+  width : 100%;
+  max-width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 10px 14px; border-radius: var(--radius2);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+}
+input:focus, select:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238880b8' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+select option { background: var(--bg3); color: var(--ink); }
+
+.email-row {
+  display: flex; gap: 10px; align-items: flex-end;
+  grid-column: 1 / -1;
+}
+.email-row .form-group { flex: 1; }
+.email-note { font-size: 0.65rem; color: var(--ink3); margin-top: 4px; }
+
+.analyze-btn {
+  margin-top: 20px; width: 100%;
+  background: linear-gradient(135deg, var(--purple), #9d5cff);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600; font-size: 0.9rem;
+  border: none; padding: 13px;
+  border-radius: var(--radius2); cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.analyze-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(124,58,237,0.45); }
+.analyze-btn:disabled { opacity: 0.5; pointer-events: none; }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── RESULTS ─────────────────────────────────────────────────────────── */
+.right-col { display: flex; flex-direction: column; gap: 16px; }
+
+.placeholder-card {
+  background: var(--card);
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--ink3);
+}
+.placeholder-icon { font-size: 3rem; opacity: 0.4; margin-bottom: 12px; }
+.placeholder-text { font-size: 0.82rem; }
+
+/* VERDICT CARD */
+.verdict-card {
+  padding: 22px 24px; border-radius: var(--radius);
+  display: flex; gap: 16px; align-items: flex-start;
+  border: 1px solid var(--border);
+  opacity: 0; transform: translateY(8px);
+  transition: all 0.35s ease;
+}
+.verdict-card.show { opacity: 1; transform: translateY(0); }
+.verdict-card.safe { background: var(--green-soft); border-color: rgba(16,185,129,0.3); }
+.verdict-card.fraud { background: var(--red-soft); border-color: rgba(239,68,68,0.3); }
+.verdict-card.suspicious { background: var(--amber-soft); border-color: rgba(245,158,11,0.3); }
+
+.verdict-icon { font-size: 2.2rem; flex-shrink: 0; }
+.verdict-label { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; }
+.verdict-card.safe .verdict-label { color: var(--green); }
+.verdict-card.fraud .verdict-label { color: var(--red); }
+.verdict-card.suspicious .verdict-label { color: var(--amber); }
+.verdict-sub { font-size: 0.78rem; color: var(--ink2); margin-top: 4px; line-height: 1.5; }
+.verdict-action {
+  margin-top: 8px; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 600; padding: 4px 12px;
+  border-radius: 100px;
+}
+.verdict-action.allow { background: rgba(16,185,129,0.15); color: var(--green); }
+.verdict-action.block { background: rgba(239,68,68,0.15); color: var(--red); }
+.verdict-action.otp   { background: rgba(245,158,11,0.15); color: var(--amber); }
+
+/* SCORE BAR */
+.score-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 24px;
+  opacity: 0; transform: translateY(8px);
+  transition: all 0.35s ease 0.08s;
+}
+.score-card.show { opacity: 1; transform: translateY(0); }
+.score-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.score-label { font-size: 0.72rem; font-weight: 500; color: var(--ink3); }
+.score-num { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; font-family: 'JetBrains Mono', monospace; }
+.score-track {
+  height: 8px; background: var(--bg3);
+  border-radius: 100px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.score-fill { height: 100%; border-radius: 100px; width: 0; transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
+.score-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.62rem; color: var(--ink3); }
+.mini-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.mini-chip {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius2); padding: 10px 14px; text-align: center;
+}
+.mini-chip-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--ink3); margin-bottom: 3px; }
+.mini-chip-val { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; }
+
+/* FLAGS */
+.flags-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 24px;
+  opacity: 0; transform: translateY(8px);
+  transition: all 0.35s ease 0.16s;
+}
+.flags-card.show { opacity: 1; transform: translateY(0); }
+.flags-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.flag-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 14px; border-radius: var(--radius2);
+  border: 1px solid var(--border);
+  background: var(--bg3); font-size: 0.8rem; line-height: 1.5;
+  animation: fadeUp 0.25s ease forwards; opacity: 0;
+}
+@keyframes fadeUp { to { opacity:1; transform: translateY(0); } from { transform: translateY(6px); } }
+.flag-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.flag-dot.high   { background: var(--red); box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+.flag-dot.medium { background: var(--amber); }
+.flag-dot.low    { background: var(--green); }
+.flag-text { flex: 1; color: var(--ink2); }
+.flag-badge {
+  font-size: 0.6rem; font-weight: 700; padding: 2px 8px;
+  border-radius: 100px; flex-shrink: 0; text-transform: uppercase;
+}
+.flag-badge.high   { background: rgba(239,68,68,0.15); color: var(--red); }
+.flag-badge.medium { background: rgba(245,158,11,0.15); color: var(--amber); }
+.flag-badge.low    { background: rgba(16,185,129,0.15); color: var(--green); }
+
+/* AI EXPLANATION */
+.ai-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 24px;
+  opacity: 0; transform: translateY(8px);
+  transition: all 0.35s ease 0.24s;
+}
+.ai-card.show { opacity: 1; transform: translateY(0); }
+.ai-inner {
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(236,72,153,0.05));
+  border: 1px solid rgba(124,58,237,0.2);
+  border-radius: var(--radius2); padding: 16px 18px;
+}
+.ai-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ai-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--purple3); flex-shrink: 0;
+  animation: pulse2 1.5s infinite;
+}
+.ai-dot.done { animation: none; background: var(--green); }
+@keyframes pulse2 { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.ai-tag { font-size: 0.68rem; font-weight: 600; color: var(--purple3); text-transform: uppercase; letter-spacing: 1px; }
+.ai-text { font-size: 0.83rem; color: var(--ink2); line-height: 1.75; }
+
+/* OTP MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(13,13,26,0.85); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 36px; max-width: 380px; width: 90%;
+  transform: scale(0.95); transition: transform 0.3s;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 60px rgba(124,58,237,0.15);
+}
+.modal-overlay.show .modal { transform: scale(1); }
+.modal-icon { font-size: 2.5rem; text-align: center; margin-bottom: 16px; }
+.modal-title { font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 8px; }
+.modal-sub { font-size: 0.8rem; color: var(--ink3); text-align: center; line-height: 1.6; margin-bottom: 24px; }
+.otp-input-wrap { position: relative; margin-bottom: 16px; }
+.otp-input {
+  width: 100%; font-size: 1.8rem !important; font-weight: 700 !important;
+  text-align: center; letter-spacing: 12px;
+  padding: 16px !important; border-radius: var(--radius) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+.modal-actions { display: flex; flex-direction: column; gap: 10px; }
+.modal-verify-btn {
+  width: 100%; background: linear-gradient(135deg, var(--purple), #9d5cff);
+  color: #fff; border: none; padding: 13px; border-radius: var(--radius2);
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.modal-verify-btn:hover { box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
+.modal-cancel-btn {
+  width: 100%; background: transparent; border: 1px solid var(--border);
+  color: var(--ink3); padding: 11px; border-radius: var(--radius2);
+  font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.85rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.modal-cancel-btn:hover { border-color: var(--border2); color: var(--ink2); }
+.otp-status { font-size: 0.78rem; text-align: center; margin-top: 10px; min-height: 20px; }
+.otp-status.success { color: var(--green); }
+.otp-status.error   { color: var(--red); }
+
+/* ── BEHAVIOR TAB ────────────────────────────────────────────────────── */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+@media(max-width:700px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+.stat-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  position: relative; overflow: hidden;
+}
+.stat-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.stat-box.total::before { background: var(--purple); }
+.stat-box.fraud::before { background: var(--red); }
+.stat-box.susp::before  { background: var(--amber); }
+.stat-box.safe::before  { background: var(--green); }
+.stat-label { font-size: 0.68rem; font-weight: 500; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.stat-val { font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; line-height: 1; }
+.stat-sub { font-size: 0.7rem; color: var(--ink3); margin-top: 4px; }
+
+.chart-section {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+}
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.chart-title { font-size: 0.85rem; font-weight: 600; color: var(--ink2); }
+.chart-legend { display: flex; gap: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--ink3); }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+canvas#riskChart { width: 100%; display: block; }
+
+/* ── HISTORY TAB ─────────────────────────────────────────────────────── */
+.history-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 24px; background: var(--card);
+  border: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0;
+  flex-wrap: wrap; gap: 12px;
+}
+.htool-info { font-size: 0.78rem; color: var(--ink3); }
+.htool-btns { display: flex; gap: 8px; }
+.hbtn {
+  font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500;
+  padding: 7px 14px; border-radius: var(--radius2); cursor: pointer; transition: all 0.2s;
+}
+.hbtn-refresh { border: 1px solid var(--border2); color: var(--ink2); background: var(--card2); }
+.hbtn-refresh:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+.hbtn-clear { border: 1px solid rgba(239,68,68,0.3); color: var(--red); background: var(--red-soft); }
+.hbtn-clear:hover { background: var(--red); color: #fff; }
+.htable-wrap {
+  overflow-x: auto;
+  background: var(--card); border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+table.htable { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+table.htable th {
+  text-align: left; padding: 12px 16px;
+  font-size: 0.65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; color: var(--ink3);
+  background: var(--bg3); border-bottom: 1px solid var(--border);
+}
+table.htable td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--ink2); vertical-align: middle; }
+table.htable tr:last-child td { border-bottom: none; }
+table.htable tr:hover td { background: rgba(124,58,237,0.04); }
+.vpill {
+  display: inline-block; padding: 3px 10px; border-radius: 100px;
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+}
+.vpill.fraud { background: rgba(239,68,68,0.15); color: var(--red); }
+.vpill.suspicious { background: rgba(245,158,11,0.15); color: var(--amber); }
+.vpill.safe { background: rgba(16,185,129,0.15); color: var(--green); }
+.score-mono { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+.del-btn {
+  background: none; border: none; cursor: pointer; color: var(--ink3);
+  font-size: 0.85rem; padding: 4px 8px; border-radius: var(--radius2); transition: all 0.15s;
+}
+.del-btn:hover { background: var(--red-soft); color: var(--red); }
+.empty-hist { text-align: center; padding: 60px; color: var(--ink3); }
+
+/* ── STATS TAB ───────────────────────────────────────────────────────── */
+.stats-tab-content {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  border-top: none; padding: 28px;
+}
+.big-stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; margin-bottom: 32px; }
+@media(max-width:700px) { .big-stats { grid-template-columns: repeat(2,1fr); } }
+.big-stat {
+  text-align: center; padding: 22px 12px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.big-stat-val { font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; font-weight: 800; line-height: 1; }
+.big-stat-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink3); margin-top: 8px; }
+.chart-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg3); }
+canvas#statsChart { display: block; width: 100%; }
+
+/* ── FOOTER ──────────────────────────────────────────────────────────── */
+footer {
+  margin-top: 48px; padding: 20px 0 28px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+}
+.footer-left { font-size: 0.72rem; color: var(--ink3); }
+.footer-right { font-size: 0.68rem; color: var(--ink3); display: flex; gap: 16px; }
+
+/* ── TOAST ───────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 12px 20px;
+  font-size: 0.8rem; color: var(--ink2); z-index: 9999;
+  transform: translateY(100px); opacity: 0;
+  transition: all 0.3s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      <div class="logo-text">Fin<span>Guard</span></div>
+      <div class="logo-sub">Invisible Fraud Detector · Random Forest ML · Real-time Scoring</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-pill" id="statusPill">
+      <div class="status-dot"></div>
+      <span id="statusText">Connecting…</span>
+    </div>
+  </div>
+</header>
+
+<!-- DEMO BAR -->
+<div class="demo-bar">
+  <span class="demo-label">🎯 Quick demo scenarios →</span>
+  <div class="demo-btns">
+    <button class="demo-btn" onclick="fillDemo('safe')">✅ Safe Transaction</button>
+    <button class="demo-btn warn" onclick="fillDemo('suspicious')">⚠️ Suspicious Payment</button>
+    <button class="demo-btn danger" onclick="fillDemo('fraud')">🚨 Fraud Pattern</button>
+    <button class="demo-btn danger" onclick="fillDemo('crypto')">💀 Crypto + Night</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('analyze', this)">⚡ Analyze</button>
+  <button class="tab-btn" onclick="switchTab('history', this)">📋 History</button>
+  <button class="tab-btn" onclick="switchTab('stats', this)">📊 Statistics</button>
+</div>
+
+<!-- ── ANALYZE TAB ─────────────────────────────────────────────── -->
+<div id="tab-analyze" class="tab-content active">
+  <div class="main-grid">
+
+    <!-- LEFT: FORM -->
+    <div class="panel">
+      <div class="panel-title">🔍 Transaction Details</div>
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label>Transaction Amount (₹)</label>
+          <input type="number" id="amount" placeholder="e.g. 5000" min="1">
+        </div>
+
+        <div class="form-group">
+          <label>Merchant Category</label>
+          <select id="merchant">
+            <option value="grocery">🛒 Grocery</option>
+            <option value="restaurant">🍽️ Restaurant</option>
+            <option value="fuel">⛽ Fuel</option>
+            <option value="electronics">📱 Electronics</option>
+            <option value="transfer">💸 P2P Transfer</option>
+            <option value="atm">🏧 ATM Withdrawal</option>
+            <option value="international">🌍 International</option>
+            <option value="crypto">🪙 Crypto Exchange</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Hour of Transaction (0–23)</label>
+          <input type="number" id="hour" placeholder="e.g. 14" min="0" max="23">
+        </div>
+
+        <div class="form-group">
+          <label>Location</label>
+          <select id="city">
+            <option value="home">🏠 Home City</option>
+            <option value="known">📍 Known City</option>
+            <option value="new_domestic">🗺️ New Domestic</option>
+            <option value="foreign">✈️ Foreign Country</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Device</label>
+          <select id="device">
+            <option value="known">💻 Known Device</option>
+            <option value="new">📲 New Device</option>
+            <option value="unknown">❓ Unknown Device</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Recipient</label>
+          <select id="recipient">
+            <option value="saved">✅ Saved Contact</option>
+            <option value="new">🆕 New Contact</option>
+            <option value="firsttime">👤 First Time</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Avg Monthly Spend (₹)</label>
+          <input type="number" id="avgspend" placeholder="e.g. 15000" min="1">
+        </div>
+
+        <div class="form-group">
+          <label>Account Age (months)</label>
+          <input type="number" id="acctage" placeholder="e.g. 24" min="0">
+        </div>
+
+        <div class="form-group full">
+          <label>Prior Fraud History</label>
+          <select id="prevfraud">
+            <option value="0">✅ No prior fraud</option>
+            <option value="1">⚠️ 1 prior flag</option>
+            <option value="2">🚨 2+ prior flags</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Your Email (for OTP on suspicious transactions)</label>
+          <input type="email" id="email" placeholder="user@example.com">
+          <div class="email-note">📧 OTP will be sent here if transaction needs verification</div>
+        </div>
+
+      </div>
+      <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
+        <div class="spinner" id="spinner"></div>
+        <span id="analyzeBtnText">🛡️ Analyze Transaction</span>
+      </button>
+    </div>
+
+    <!-- RIGHT: RESULTS -->
+    <div class="right-col" id="results">
+      <div class="placeholder-card" id="placeholderCard">
+        <div class="placeholder-icon">🔮</div>
+        <div class="placeholder-text">Fill in transaction details and click <strong>Analyze</strong> to get a real-time fraud risk assessment</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HISTORY TAB ─────────────────────────────────────────────── -->
+<div id="tab-history" class="tab-content">
+  <div class="history-toolbar">
+    <div class="htool-info" id="histInfo">Loading history…</div>
+    <div class="htool-btns">
+      <button class="hbtn hbtn-refresh" onclick="loadHistory()">🔄 Refresh</button>
+      <button class="hbtn hbtn-clear" onclick="clearHistory()">🗑️ Clear All</button>
+    </div>
+  </div>
+  <div class="htable-wrap">
+    <table class="htable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Timestamp</th>
+          <th>Amount</th>
+          <th>Merchant</th>
+          <th>City</th>
+          <th>Device</th>
+          <th>Score</th>
+          <th>Verdict</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="histBody">
+        <tr><td colspan="9" class="empty-hist">No transactions yet</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── STATS TAB ───────────────────────────────────────────────── -->
+<div id="tab-stats" class="tab-content">
+  <div class="history-toolbar">
+    <div class="htool-info">System-wide fraud detection statistics</div>
+    <div class="htool-btns">
+      <button class="hbtn hbtn-refresh" onclick="loadStats()">🔄 Refresh</button>
+    </div>
+  </div>
+  <div class="stats-tab-content">
+    <div class="big-stats" id="bigStats">
+      <div class="big-stat"><div class="big-stat-val" id="sTotal">—</div><div class="big-stat-lbl">Total Analyzed</div></div>
+      <div class="big-stat"><div class="big-stat-val" style="color:var(--red)" id="sFraud">—</div><div class="big-stat-lbl">Fraud Blocked</div></div>
+      <div class="big-stat"><div class="big-stat-val" style="color:var(--amber)" id="sSusp">—</div><div class="big-stat-lbl">Suspicious</div></div>
+      <div class="big-stat"><div class="big-stat-val" style="color:var(--green)" id="sSafe">—</div><div class="big-stat-lbl">Safe Passed</div></div>
+      <div class="big-stat"><div class="big-stat-val" style="color:var(--red)" id="sFraudRate">—</div><div class="big-stat-lbl">Fraud Rate %</div></div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="statsChart" height="280"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">FinGuard — The Invisible Fraud Detector System · JSS University · AI Solution Expo 2025</div>
+  <div class="footer-right">
+    <span id="footerModel">Model: Loading…</span>
+    <span id="footerTotal">Total: 0</span>
+  </div>
+</footer>
+
+</div><!-- /wrap -->
+
+<!-- OTP MODAL -->
+<div class="modal-overlay" id="otpModal">
+  <div class="modal">
+    <div class="modal-icon">🔐</div>
+    <div class="modal-title">Verification Required</div>
+    <div class="modal-sub" id="otpSub">This transaction looks suspicious. Enter the OTP sent to your email to proceed.</div>
+    <div class="otp-input-wrap">
+      <input type="text" class="otp-input" id="otpInput" placeholder="••••••" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-verify-btn" onclick="verifyOtp()">✅ Verify OTP</button>
+      <button class="modal-cancel-btn" onclick="closeOtp()">Cancel Transaction</button>
+    </div>
+    <div class="otp-status" id="otpStatus"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let lastResult = null;
+let statsChart = null;
+
+// ── UTILS ──────────────────────────────────────────────────────────────
+function showToast(msg, duration = 3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'history') loadHistory();
+  if (name === 'stats') loadStats();
+}
+
+// ── HEALTH CHECK ──────────────────────────────────────────────────────
+async function checkHealth() {
+  try {
+    const r = await fetch(API + '/health');
+    const d = await r.json();
+    document.getElementById('statusText').textContent =
+      `ML Active · ${d.total_analyzed} analyzed · FP Rate: ${d.false_positive_rate}%`;
+    document.getElementById('footerModel').textContent = `Trained on ${(d.trained_on || 0).toLocaleString()} txns`;
+    document.getElementById('footerTotal').textContent = `Analyzed: ${d.total_analyzed}`;
+  } catch {
+    document.getElementById('statusText').textContent = 'Backend offline — start app.py';
+    document.querySelector('.status-dot').style.background = 'var(--red)';
+  }
+}
+
+// ── DEMO FILLS ────────────────────────────────────────────────────────
+const DEMOS = {
+  safe: { amount:850, merchant:'grocery', hour:14, city:'home', device:'known', recipient:'saved', avgspend:20000, acctage:36, prevfraud:'0' },
+  suspicious: { amount:12000, merchant:'electronics', hour:23, city:'new_domestic', device:'new', recipient:'new', avgspend:15000, acctage:8, prevfraud:'0' },
+  fraud: { amount:75000, merchant:'international', hour:3, city:'foreign', device:'unknown', recipient:'firsttime', avgspend:12000, acctage:2, prevfraud:'2' },
+  crypto: { amount:50000, merchant:'crypto', hour:2, city:'foreign', device:'unknown', recipient:'firsttime', avgspend:18000, acctage:6, prevfraud:'1' }
+};
+
+function fillDemo(type) {
+  const d = DEMOS[type];
+  Object.entries(d).forEach(([k, v]) => {
+    const el = document.getElementById(k);
+    if (el) el.value = v;
+  });
+  showToast(`Demo "${type}" loaded!`);
+}
+
+// ── ANALYZE ───────────────────────────────────────────────────────────
+async function analyze() {
+  const btn  = document.getElementById('analyzeBtn');
+  const spin = document.getElementById('spinner');
+  const txt  = document.getElementById('analyzeBtnText');
+
+  const payload = {
+    amount:    document.getElementById('amount').value,
+    merchant:  document.getElementById('merchant').value,
+    hour:      document.getElementById('hour').value,
+    city:      document.getElementById('city').value,
+    device:    document.getElementById('device').value,
+    recipient: document.getElementById('recipient').value,
+    avgspend:  document.getElementById('avgspend').value,
+    acctage:   document.getElementById('acctage').value,
+    prevfraud: document.getElementById('prevfraud').value,
+    email:     document.getElementById('email').value
+  };
+
+  if (!payload.amount || !payload.hour || !payload.avgspend || !payload.acctage) {
+    showToast('⚠️ Please fill in all required fields');
+    return;
+  }
+
+  btn.disabled = true;
+  spin.style.display = 'block';
+  txt.textContent = 'Analyzing…';
+
+  try {
+    const res  = await fetch(API + '/analyze', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    lastResult = data;
+    renderResults(data);
+    checkHealth();
+
+    if (data.otp_required) {
+      const sub = data.otp_sent
+        ? `OTP sent to ${payload.email}. Enter it below to approve this transaction.`
+        : `Transaction flagged as suspicious (score: ${data.score}/100). Enter the OTP to proceed.`;
+      document.getElementById('otpSub').textContent = sub;
+      document.getElementById('otpModal').classList.add('show');
+      document.getElementById('otpInput').focus();
+    }
+
+  } catch(e) {
+    showToast('❌ Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    spin.style.display = 'none';
+    txt.textContent = '🛡️ Analyze Transaction';
+  }
+}
+
+// ── RENDER RESULTS ────────────────────────────────────────────────────
+function renderResults(data) {
+  const rc = document.getElementById('results');
+  document.getElementById('placeholderCard')?.remove();
+
+  const scoreColor = data.score >= 60 ? 'var(--red)' : data.score >= 30 ? 'var(--amber)' : 'var(--green)';
+  const fillGrad   = data.score >= 60
+    ? 'linear-gradient(90deg, var(--amber), var(--red))'
+    : data.score >= 30
+    ? 'linear-gradient(90deg, var(--green), var(--amber))'
+    : 'linear-gradient(90deg, #10b981, #34d399)';
+
+  const verdictEmoji  = { fraud: '🚨', suspicious: '⚠️', safe: '✅' }[data.verdict];
+  const verdictTitle  = { fraud: 'FRAUD DETECTED', suspicious: 'SUSPICIOUS', safe: 'TRANSACTION SAFE' }[data.verdict];
+  const actionLabel   = { BLOCK:'Transaction Blocked', OTP_REQUIRED:'OTP Verification Required', ALLOW:'Transaction Approved' }[data.action];
+  const actionClass   = { BLOCK:'block', OTP_REQUIRED:'otp', ALLOW:'allow' }[data.action];
+
+  rc.innerHTML = `
+    <div class="verdict-card ${data.verdict}">
+      <div class="verdict-icon">${verdictEmoji}</div>
+      <div>
+        <div class="verdict-label">${verdictTitle}</div>
+        <div class="verdict-sub">Risk Score: <strong>${data.score}/100</strong> · Fraud Probability: <strong>${data.fraud_probability}%</strong></div>
+        <div class="verdict-action ${actionClass}">${actionLabel}</div>
+      </div>
+    </div>
+
+    <div class="score-card">
+      <div class="panel-title">📊 Risk Breakdown</div>
+      <div class="score-header">
+        <span class="score-label">Composite Risk Score</span>
+        <span class="score-num" style="color:${scoreColor}">${data.score}</span>
+      </div>
+      <div class="score-track">
+        <div class="score-fill" id="scoreFill" style="background:${fillGrad}"></div>
+      </div>
+      <div class="score-labels">
+        <span>Safe (0–29)</span>
+        <span>Suspicious (30–59)</span>
+        <span>Fraud (60+)</span>
+      </div>
+      <div class="mini-scores">
+        <div class="mini-chip">
+          <div class="mini-chip-label">ML Score</div>
+          <div class="mini-chip-val" style="color:${scoreColor}">${data.ml_score}</div>
+        </div>
+        <div class="mini-chip">
+          <div class="mini-chip-label">Rule Score</div>
+          <div class="mini-chip-val" style="color:${scoreColor}">${data.rule_score}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flags-card">
+      <div class="panel-title">🚩 Risk Flags (${data.flags_count} detected · ${data.high_flags} high)</div>
+      <div class="flags-list" id="flagsList"></div>
+    </div>
+
+    <div class="ai-card">
+      <div class="panel-title">🤖 AI Explanation</div>
+      <div class="ai-inner">
+        <div class="ai-header">
+          <div class="ai-dot done"></div>
+          <span class="ai-tag">Explainable AI — Plain Language Verdict</span>
+        </div>
+        <div class="ai-text">${data.explanation}</div>
+      </div>
+    </div>
+  `;
+
+  // Animate show
+  setTimeout(() => {
+    document.querySelectorAll('.verdict-card, .score-card, .flags-card, .ai-card').forEach(el => el.classList.add('show'));
+  }, 50);
+
+  // Animate score bar
+  setTimeout(() => {
+    document.getElementById('scoreFill').style.width = data.score + '%';
+  }, 200);
+
+  // Render flags
+  const fl = document.getElementById('flagsList');
+  if (data.flags.length === 0) {
+    fl.innerHTML = '<div style="color:var(--ink3);font-size:0.8rem;padding:12px;">No risk flags detected — transaction looks normal.</div>';
+  } else {
+    data.flags.forEach((f, i) => {
+      const row = document.createElement('div');
+      row.className = 'flag-row';
+      row.style.animationDelay = (i * 0.07) + 's';
+      row.innerHTML = `
+        <div class="flag-dot ${f.weight}"></div>
+        <div class="flag-text">${f.text}</div>
+        <div class="flag-badge ${f.weight}">${f.weight}</div>
+      `;
+      fl.appendChild(row);
+    });
+  }
+}
+
+// ── OTP ───────────────────────────────────────────────────────────────
+async function verifyOtp() {
+  const otp = document.getElementById('otpInput').value.trim();
+  const statusEl = document.getElementById('otpStatus');
+  if (otp.length < 4) { statusEl.textContent = 'Please enter a valid OTP'; statusEl.className = 'otp-status error'; return; }
+  statusEl.textContent = 'Verifying…'; statusEl.className = 'otp-status';
+  try {
+    const res  = await fetch(API + '/verify-otp', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({otp}) });
+    const data = await res.json();
+    if (data.status === 'VERIFIED') {
+      statusEl.textContent = '✅ ' + data.message;
+      statusEl.className = 'otp-status success';
+      setTimeout(() => { closeOtp(); showToast('✅ Transaction approved after OTP verification!'); }, 1500);
+    } else {
+      statusEl.textContent = '❌ ' + data.message;
+      statusEl.className = 'otp-status error';
+      document.getElementById('otpInput').value = '';
+    }
+  } catch(e) { statusEl.textContent = 'Error: ' + e.message; statusEl.className = 'otp-status error'; }
+}
+
+function closeOtp() {
+  document.getElementById('otpModal').classList.remove('show');
+  document.getElementById('otpInput').value = '';
+  document.getElementById('otpStatus').textContent = '';
+}
+
+document.getElementById('otpInput').addEventListener('keydown', e => { if (e.key === 'Enter') verifyOtp(); });
+
+// ── HISTORY ───────────────────────────────────────────────────────────
+async function loadHistory() {
+  try {
+    const res  = await fetch(API + '/history?limit=100');
+    const rows = await res.json();
+    const body = document.getElementById('histBody');
+    const info = document.getElementById('histInfo');
+    info.textContent = `${rows.length} transaction${rows.length !== 1 ? 's' : ''} in database`;
+    if (!rows.length) { body.innerHTML = '<tr><td colspan="9" class="empty-hist">No transactions recorded yet</td></tr>'; return; }
+    body.innerHTML = rows.map(r => `
+      <tr>
+        <td style="color:var(--ink3)">#${r.id}</td>
+        <td style="font-size:0.73rem">${r.timestamp}</td>
+        <td>₹${Number(r.amount).toLocaleString()}</td>
+        <td style="text-transform:capitalize">${r.merchant}</td>
+        <td style="text-transform:capitalize">${r.city.replace('_',' ')}</td>
+        <td style="text-transform:capitalize">${r.device}</td>
+        <td><span class="score-mono" style="color:${r.score>=60?'var(--red)':r.score>=30?'var(--amber)':'var(--green)'}">${r.score}</span></td>
+        <td><span class="vpill ${r.verdict}">${r.verdict}</span></td>
+        <td><button class="del-btn" onclick="deleteTxn(${r.id})">🗑️</button></td>
+      </tr>
+    `).join('');
+  } catch(e) { showToast('Could not load history'); }
+}
+
+async function deleteTxn(id) {
+  await fetch(API + '/history/' + id, { method: 'DELETE' });
+  loadHistory(); showToast('Transaction deleted');
+}
+
+async function clearHistory() {
+  if (!confirm('Clear all transaction history?')) return;
+  await fetch(API + '/history/clear', { method: 'DELETE' });
+  loadHistory(); showToast('History cleared');
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res  = await fetch(API + '/stats');
+    const data = await res.json();
+    document.getElementById('sTotal').textContent = data.total;
+    document.getElementById('sFraud').textContent = data.fraud;
+    document.getElementById('sSusp').textContent  = data.suspicious;
+    document.getElementById('sSafe').textContent  = data.safe;
+    document.getElementById('sFraudRate').textContent = data.fraud_rate + '%';
+
+    renderStatsChart(data);
+  } catch(e) { showToast('Could not load statistics'); }
+}
+
+function renderStatsChart(data) {
+  const canvas = document.getElementById('statsChart');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.parentElement.offsetWidth;
+  canvas.width  = W; canvas.height = 280;
+
+  const categories = ['Safe', 'Suspicious', 'Fraud'];
+  const values     = [data.safe, data.suspicious, data.fraud];
+  const colors     = ['#10b981', '#f59e0b', '#ef4444'];
+  const max        = Math.max(...values, 1);
+  const barW       = 80; const gap = 60;
+  const totalW     = categories.length * (barW + gap);
+  const startX     = (W - totalW) / 2 + gap / 2;
+  const chartH     = 200; const chartY = 30;
+
+  ctx.clearRect(0, 0, W, 280);
+
+  categories.forEach((cat, i) => {
+    const x    = startX + i * (barW + gap);
+    const barH = (values[i] / max) * chartH;
+    const y    = chartY + chartH - barH;
+
+    const grad = ctx.createLinearGradient(0, y, 0, chartY + chartH);
+    grad.addColorStop(0, colors[i]);
+    grad.addColorStop(1, colors[i] + '44');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(x, y, barW, barH, 6);
+    ctx.fill();
+
+    ctx.fillStyle = colors[i];
+    ctx.font = 'bold 16px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(values[i], x + barW / 2, y - 8);
+
+    ctx.fillStyle = '#8880b8';
+    ctx.font = '12px Inter, sans-serif';
+    ctx.fillText(cat, x + barW / 2, chartY + chartH + 20);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+checkHealth();
+setInterval(checkHealth, 30000);
+</script>
+</body>
+</html>

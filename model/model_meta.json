@@ -1,0 +1,31 @@
+{
+  "features": [
+    "amount_ratio",
+    "hour_risk",
+    "location_risk",
+    "device_risk",
+    "merchant_risk",
+    "recipient_risk",
+    "account_age_risk",
+    "prior_fraud_risk",
+    "combo_location_device",
+    "combo_hour_amount"
+  ],
+  "feature_importance": {
+    "merchant_risk": 0.37420931538466967,
+    "amount_ratio": 0.2155828228191072,
+    "combo_hour_amount": 0.1952664719487488,
+    "account_age_risk": 0.11616442114335002,
+    "location_risk": 0.02652350686132576,
+    "recipient_risk": 0.02012898268786882,
+    "hour_risk": 0.01713790434476236,
+    "device_risk": 0.01535650143885369,
+    "combo_location_device": 0.011896540506744017,
+    "prior_fraud_risk": 0.007733532864569671
+  },
+  "n_train": 227845,
+  "n_test": 56962,
+  "fraud_rate": 0.001727485630620034,
+  "false_positive_rate": 0.01686480022509848,
+  "recall": 0.24489795918367346
+}
