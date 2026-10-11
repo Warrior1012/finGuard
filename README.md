@@ -45,7 +45,7 @@ Open `http://localhost:5000`. If the repository's platform-specific startup scri
 
 Copy `.env.example` to `.env` and configure `SMTP_USER` and `SMTP_PASSWORD` if email OTP is required. The application now reads SMTP settings from the environment; without them, email OTP is not sent. The repository previously contained hard-coded SMTP credentials. **Revoke/rotate them immediately**; this source change cannot erase old commits from Git history.
 
-The local SQLite database and Python bytecode cache are excluded from version control. Each installation creates its own runtime database.
+The local SQLite database was removed from the current branch, and `.gitignore` now excludes local databases and Python cache files from future additions. Each installation creates its own runtime database.
 
 The old SMTP credentials were removed from the current source, but remain potentially recoverable from Git history. Rotate/revoke them with the email provider now; deleting them from a new commit does not invalidate them. Keep replacement credentials only in local `.env` files or your deployment secret store. Do not commit `.env` files, local database files, or private data artifacts.
 
