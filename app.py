@@ -42,7 +42,7 @@ def send_email_otp(receiver_email, otp):
     message["From"] = sender_email
     message["To"] = receiver_email
     message.set_content(
-        f"Your FinGuard verification OTP is: {otp}\\n\\n"
+        f"Your FinGuard verification OTP is: {otp}\n\n"
         "This OTP expires in 5 minutes. Do not share it with anyone."
     )
 
