@@ -47,9 +47,7 @@ Copy `.env.example` to `.env` and configure `SMTP_USER` and `SMTP_PASSWORD` if e
 
 The local SQLite database and Python bytecode cache are excluded from version control. Each installation creates its own runtime database.
 
-**Before deploying, remove all credentials from source code.** The current application source contains hard-coded SMTP credential values. Treat those credentials as exposed: revoke/rotate them immediately, move replacements into environment variables or a secret manager, and never reuse committed credentials. This README intentionally does not reproduce them.
-
-Configure mail settings through environment variables (for example, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_FROM`) after updating the application to read them. Do not commit `.env` files, database files, or private model/data artifacts unless there is a deliberate reason to publish them.
+The old SMTP credentials were removed from the current source, but remain potentially recoverable from Git history. Rotate/revoke them with the email provider now; deleting them from a new commit does not invalidate them. Keep replacement credentials only in local `.env` files or your deployment secret store. Do not commit `.env` files, local database files, or private data artifacts.
 
 ## Model and evaluation
 
