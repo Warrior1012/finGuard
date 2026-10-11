@@ -3,13 +3,18 @@ FinGuard Backend — Flask API + SQLite Database
 Invisible Fraud Detector System
 """
 import random
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
-import joblib, json, os, numpy as np
+import os
+import smtplib
 import sqlite3
 from datetime import datetime
-import smtplib
-import random
+from email.message import EmailMessage
+
+from dotenv import load_dotenv
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+import joblib, json, numpy as np
+
+load_dotenv()
 
 otp_store = {}
 
@@ -22,20 +27,36 @@ MODEL_DIR = os.path.join(BASE, 'model')
 
 # ── EMAIL OTP ─────────────────────────────────────────────────────────
 def send_email_otp(receiver_email, otp):
-    sender_email = "cabc4619@gmail.com"
-    app_password = "hojhifjnrjzlsdvc"
+    """Send an OTP only when SMTP credentials are configured in the environment."""
+    sender_email = os.getenv("SMTP_USER")
+    app_password = os.getenv("SMTP_PASSWORD")
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+
+    if not sender_email or not app_password:
+        app.logger.warning("OTP email not sent: SMTP_USER/SMTP_PASSWORD are not configured.")
+        return False
+
+    message = EmailMessage()
+    message["Subject"] = "FinGuard Security OTP"
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message.set_content(
+        f"Your FinGuard verification OTP is: {otp}\\n\\n"
+        "This OTP expires in 5 minutes. Do not share it with anyone."
+    )
+
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.ehlo()
-        server.starttls()
-        server.login(sender_email, app_password)
-        message = f"Subject: FinGuard Security OTP\n\nYour FinGuard verification OTP is: {otp}\n\nThis OTP expires in 5 minutes. Do not share it with anyone."
-        server.sendmail(sender_email, receiver_email, message)
-        print("Sending OTP to:", receiver_email)
-        server.quit()
+        with smtplib.SMTP(smtp_host, smtp_port, timeout=15) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(sender_email, app_password)
+            server.send_message(message)
         return True
-    except Exception as e:
-        print(f"Email failed: {e}")
+    except (OSError, smtplib.SMTPException, ValueError):
+        # Avoid logging recipient addresses, OTPs, or provider responses.
+        app.logger.warning("OTP email delivery failed; check SMTP configuration.")
         return False
 
 # ── DATABASE ──────────────────────────────────────────────────────────
@@ -317,7 +338,6 @@ def analyze():
             otp_required = True
             otp = str(random.randint(100000, 999999))
             otp_store['demo_user'] = otp
-            print(f"OTP Generated: {otp}")
             if user_email:
                 otp_sent = send_email_otp(user_email, otp)
 
