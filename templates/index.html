@@ -508,6 +508,30 @@ footer {
   transition: all 0.3s; pointer-events: none;
 }
 .toast.show { transform: translateY(0); opacity: 1; }
+
+
+/* FinGuard motion layer: subtle, fast, and reduced-motion aware */
+@keyframes fg-enter { from { opacity: 0; transform: translateY(18px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes fg-orbit { 0%,100% { transform: translate3d(0,0,0) scale(1); opacity:.45; } 50% { transform: translate3d(18px,12px,0) scale(1.08); opacity:.8; } }
+@keyframes fg-sheen { from { background-position: 180% 0; } to { background-position: -180% 0; } }
+@keyframes fg-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); } 50% { box-shadow: 0 0 0 5px rgba(16,185,129,.07); } }
+body::after { content:""; position:fixed; width:360px; height:360px; right:-140px; bottom:-150px; border-radius:50%; background:radial-gradient(circle,rgba(16,185,129,.10),transparent 68%); pointer-events:none; z-index:0; animation:fg-orbit 12s ease-in-out infinite; }
+.wrap { position:relative; z-index:1; }
+header, .header, .topbar, .hero { animation:fg-enter .7s cubic-bezier(.2,.7,.2,1) both; }
+.card, .stat-card, .panel, .result-card, .feature-card, .metric-card { transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease; }
+.card:hover, .stat-card:hover, .panel:hover, .result-card:hover, .feature-card:hover, .metric-card:hover { transform:translateY(-3px); border-color:rgba(16,185,129,.36); box-shadow:0 14px 36px rgba(0,0,0,.18); }
+button, .btn, input, select { transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,filter .18s ease; }
+button:hover, .btn:hover { filter:brightness(1.08); }
+button:active, .btn:active { transform:scale(.98); }
+input:focus, select:focus { outline:none; box-shadow:0 0 0 3px rgba(16,185,129,.13); }
+.fg-reveal { opacity:0; transform:translateY(14px); }
+.fg-reveal.fg-visible { opacity:1; transform:translateY(0); transition:opacity .55s ease,transform .55s cubic-bezier(.2,.7,.2,1); }
+.fg-scan { position:relative; overflow:hidden; }
+.fg-scan::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.035) 48%,transparent 65%); background-size:200% 100%; animation:fg-sheen 5.5s ease-in-out infinite; }
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; transition-duration:.01ms!important; }
+  .fg-reveal { opacity:1; transform:none; }
+}
 </style>
 </head>
 <body>
@@ -1068,5 +1092,37 @@ function renderStatsChart(data) {
 checkHealth();
 setInterval(checkHealth, 30000);
 </script>
+
+<script>
+(() => {
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cards = document.querySelectorAll('.card, .stat-card, .panel, .result-card, .feature-card, .metric-card');
+  cards.forEach((el, i) => { el.classList.add('fg-reveal'); el.style.transitionDelay = (Math.min(i, 8) * 45) + 'ms'; });
+  if (reduce || !('IntersectionObserver' in window)) {
+    document.querySelectorAll('.fg-reveal').forEach(el => el.classList.add('fg-visible'));
+  } else {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) { entry.target.classList.add('fg-visible'); observer.unobserve(entry.target); }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.fg-reveal').forEach(el => observer.observe(el));
+  }
+  // Count up only for clearly numeric dashboard metrics; do not alter transaction inputs.
+  const metrics = document.querySelectorAll('[data-count-up]');
+  metrics.forEach(el => {
+    const target = Number(el.getAttribute('data-count-up'));
+    if (!Number.isFinite(target) || reduce) { el.textContent = String(target); return; }
+    const start = performance.now(), duration = 850;
+    const tick = now => {
+      const p = Math.min(1, (now - start) / duration);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+})();
+</script>
+
 </body>
 </html>
