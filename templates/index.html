@@ -533,6 +533,48 @@ input:focus, select:focus { outline:none; box-shadow:0 0 0 3px rgba(16,185,129,.
   .fg-reveal { opacity:1; transform:none; }
 }
 </style>
+
+<style id="finguard-cinematic-motion">
+:root{--fg-motion-ease:cubic-bezier(.16,1,.3,1);--fg-glow:rgba(151,77,255,.22)}
+html{scroll-behavior:smooth}
+body{isolation:isolate;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:-25%;z-index:-2;pointer-events:none;background:radial-gradient(ellipse at 18% 18%,rgba(115,48,235,.18),transparent 34%),radial-gradient(ellipse at 83% 35%,rgba(28,118,255,.12),transparent 32%),radial-gradient(ellipse at 55% 90%,rgba(236,58,178,.08),transparent 35%);animation:fgAurora 18s ease-in-out infinite alternate;will-change:transform}
+body::after{content:"";position:fixed;inset:0;z-index:50;pointer-events:none;opacity:.13;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");mix-blend-mode:soft-light}
+@keyframes fgAurora{0%{transform:translate3d(-1.5%,0,0) scale(1)}100%{transform:translate3d(1.5%,-2%,0) scale(1.06)}}
+#fg-intro{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#090814;overflow:hidden;transition:opacity .75s var(--fg-motion-ease),visibility .75s}
+#fg-intro.fg-intro-out{opacity:0;visibility:hidden;pointer-events:none}
+#fg-intro .fg-intro-orb{position:absolute;width:min(85vw,650px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(126,56,255,.28),rgba(51,75,255,.09) 38%,transparent 68%);filter:blur(15px);animation:fgOrb 2.5s ease-in-out infinite alternate}
+#fg-intro .fg-intro-core{position:relative;display:flex;align-items:center;flex-direction:column;gap:18px;text-align:center;padding:28px;animation:fgRise 1s var(--fg-motion-ease) both}
+#fg-intro .fg-mark{width:86px;height:86px;display:grid;place-items:center;border:1px solid rgba(200,164,255,.55);border-radius:27px;background:linear-gradient(145deg,rgba(157,74,255,.95),rgba(227,52,170,.72));box-shadow:0 0 28px rgba(149,74,255,.45),inset 0 1px 0 #ffffff75;animation:fgMark 1.7s ease-in-out infinite}
+#fg-intro .fg-mark svg{width:43px;height:43px;filter:drop-shadow(0 4px 10px #28084b80)}
+#fg-intro .fg-wordmark{font-size:clamp(35px,8vw,56px);font-weight:850;letter-spacing:-2.5px;color:#fff;line-height:1}
+#fg-intro .fg-wordmark span{background:linear-gradient(90deg,#c7a2ff,#f38bdd,#8da9ff);background-size:200% auto;color:transparent;background-clip:text;-webkit-background-clip:text;animation:fgShimmer 2.4s linear infinite}
+#fg-intro .fg-tagline{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#a8a0ca}
+#fg-intro .fg-loader{height:3px;width:180px;border-radius:8px;background:#ffffff12;overflow:hidden;margin-top:8px}
+#fg-intro .fg-loader span{display:block;width:35%;height:100%;border-radius:8px;background:linear-gradient(90deg,#8d4cff,#e25bc4,#7b9cff);box-shadow:0 0 16px #b46cff;animation:fgLoad 1.35s var(--fg-motion-ease) forwards}
+@keyframes fgOrb{to{transform:scale(1.18);opacity:.65}}@keyframes fgMark{50%{transform:translateY(-5px) rotate(-2deg);box-shadow:0 0 48px rgba(149,74,255,.65),inset 0 1px 0 #ffffff75}}@keyframes fgRise{from{opacity:0;transform:translateY(24px) scale(.94);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}@keyframes fgShimmer{to{background-position:200% center}}@keyframes fgLoad{to{width:100%}}
+body.fg-ready .wrap,body.fg-ready main,body.fg-ready header,body.fg-ready .container{animation:fgPageEnter .95s var(--fg-motion-ease) both}
+@keyframes fgPageEnter{from{opacity:.3;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fg-reveal{opacity:0;transform:translateY(22px) scale(.985);filter:blur(4px);transition:opacity .75s var(--fg-motion-ease),transform .75s var(--fg-motion-ease),filter .75s var(--fg-motion-ease)}
+.fg-reveal.fg-visible{opacity:1;transform:none;filter:blur(0)}
+button,.tab-btn,[role=button],input[type=submit]{position:relative;overflow:hidden;isolation:isolate;transition:transform .22s var(--fg-motion-ease),box-shadow .3s ease,border-color .3s ease,filter .3s ease}
+button::after,.tab-btn::after,[role=button]::after,input[type=submit]::after{content:"";position:absolute;inset:-80% auto -80% -45%;width:28%;transform:translateX(-180%) rotate(18deg);background:linear-gradient(90deg,transparent,#ffffff35,transparent);pointer-events:none;transition:transform .7s var(--fg-motion-ease);z-index:-1}
+button:hover::after,.tab-btn:hover::after,[role=button]:hover::after,input[type=submit]:hover::after{transform:translateX(650%) rotate(18deg)}
+button:hover,.tab-btn:hover,[role=button]:hover,input[type=submit]:hover{filter:brightness(1.12);box-shadow:0 8px 28px rgba(136,74,255,.17)}
+button:active,.tab-btn:active,[role=button]:active,input[type=submit]:active{transform:scale(.965);filter:brightness(1.22)}
+.fg-ripple{position:absolute;border-radius:50%;pointer-events:none;z-index:5;background:radial-gradient(circle,rgba(255,255,255,.38),rgba(191,139,255,.18) 42%,transparent 72%);transform:scale(0);animation:fgRipple .72s ease-out forwards}
+@keyframes fgRipple{to{transform:scale(1);opacity:0}}
+.card,.panel,.transaction-card,.stat-card,.result-card,.glass-card,.tab-content{transition:transform .45s var(--fg-motion-ease),border-color .35s ease,box-shadow .45s ease}
+.card:hover,.panel:hover,.transaction-card:hover,.stat-card:hover,.result-card:hover,.glass-card:hover{transform:translateY(-3px);border-color:rgba(164,111,255,.38);box-shadow:0 18px 50px rgba(0,0,0,.16),0 0 28px rgba(128,70,255,.07)}
+input,select,textarea{transition:border-color .25s ease,box-shadow .3s ease,background .3s ease,transform .3s var(--fg-motion-ease)}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(155,91,255,.14),0 0 25px rgba(155,91,255,.09)!important;transform:translateY(-1px)}
+.fg-cursor-glow{position:fixed;left:0;top:0;width:260px;height:260px;z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(133,76,255,.075),transparent 68%);transform:translate(-50%,-50%);opacity:0;transition:opacity .3s}
+.fg-scanline{position:fixed;top:-20vh;left:0;right:0;height:18vh;z-index:49;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(147,93,255,.035),transparent);animation:fgScan 9s linear infinite;opacity:.65}
+@keyframes fgScan{to{top:120vh}}
+@media(hover:hover) and (pointer:fine){.fg-cursor-glow{opacity:1}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}#fg-intro{display:none}.fg-reveal{opacity:1;transform:none;filter:none}.fg-cursor-glow,.fg-scanline{display:none}}
+</style>
+
 </head>
 <body>
 <div class="wrap">
@@ -1121,6 +1163,63 @@ setInterval(checkHealth, 30000);
     };
     requestAnimationFrame(tick);
   });
+})();
+</script>
+
+
+<script id="finguard-cinematic-motion-js">
+(() => {
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const boot = () => {
+    if (document.getElementById('fg-intro') || reduce) { document.body.classList.add('fg-ready'); return; }
+    const intro = document.createElement('div');
+    intro.id = 'fg-intro';
+    intro.setAttribute('role','status');
+    intro.setAttribute('aria-label','Loading FinGuard');
+    intro.innerHTML = '<div class="fg-intro-orb"></div><div class="fg-intro-core"><div class="fg-mark"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 4 40 10v12c0 10-6.5 17-16 22C14.5 39 8 32 8 22V10L24 4Z" fill="white" fill-opacity=".95"/><path d="M24 9 35 13v9c0 7.2-4.3 12.8-11 17-6.7-4.2-11-9.8-11-17v-9L24 9Z" fill="#9B55F7"/><path d="m17 23 4.5 4.5L31 18" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="fg-wordmark">Fin<span>Guard</span></div><div class="fg-tagline">Trust every transaction</div><div class="fg-loader"><span></span></div></div>';
+    document.body.appendChild(intro);
+    window.setTimeout(() => { intro.classList.add('fg-intro-out'); document.body.classList.add('fg-ready'); window.setTimeout(() => intro.remove(), 850); }, 1650);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true}); else boot();
+
+  const addAtmosphere = () => {
+    if (!document.querySelector('.fg-cursor-glow')) { const glow=document.createElement('div'); glow.className='fg-cursor-glow'; document.body.appendChild(glow); }
+    if (!document.querySelector('.fg-scanline') && !reduce) { const scan=document.createElement('div'); scan.className='fg-scanline'; document.body.appendChild(scan); }
+  };
+  addAtmosphere();
+  document.addEventListener('pointermove', e => {
+    const glow=document.querySelector('.fg-cursor-glow');
+    if(glow && e.pointerType==='mouse'){glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';}
+  }, {passive:true});
+
+  document.addEventListener('click', e => {
+    const target=e.target.closest('button,.tab-btn,[role="button"],input[type="submit"]');
+    if(!target || reduce) return;
+    const rect=target.getBoundingClientRect();
+    const size=Math.max(rect.width,rect.height)*1.65;
+    const ripple=document.createElement('span');
+    ripple.className='fg-ripple';
+    ripple.style.width=size+'px';ripple.style.height=size+'px';
+    ripple.style.left=(e.clientX-rect.left-size/2)+'px';
+    ripple.style.top=(e.clientY-rect.top-size/2)+'px';
+    target.appendChild(ripple);
+    window.setTimeout(()=>ripple.remove(),760);
+  }, true);
+
+  const observe = () => {
+    const selectors='.card,.panel,.transaction-card,.stat-card,.result-card,.glass-card,.form-section,.section,.tab-content,.quick-demo,.demo-scenarios';
+    document.querySelectorAll(selectors).forEach((el,i)=>{
+      if(el.dataset.fgReveal) return;
+      el.dataset.fgReveal='1';el.classList.add('fg-reveal');el.style.transitionDelay=Math.min(i%6,5)*65+'ms';
+      if(!('IntersectionObserver' in window)){el.classList.add('fg-visible');return;}
+      const io=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('fg-visible');io.unobserve(entry.target);}}),{threshold:.08,rootMargin:'0px 0px -25px 0px'});
+      io.observe(el);
+    });
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',observe,{once:true}); else observe();
+  const mo=new MutationObserver(()=>observe());
+  mo.observe(document.documentElement,{childList:true,subtree:true});
+  window.addEventListener('load',()=>{document.body.classList.add('fg-ready');observe();},{once:true});
 })();
 </script>
 
