@@ -760,7 +760,7 @@ input:focus, select:focus { outline:none; box-shadow:0 0 0 3px rgba(16,185,129,.
 <div class="toast" id="toast"></div>
 
 <script>
-const API = 'http://localhost:5000/api';
+const API = `${window.location.origin}/api`;
 let lastResult = null;
 let statsChart = null;
 
